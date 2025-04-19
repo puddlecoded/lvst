@@ -36,3 +36,9 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+media-controller {
+    display:block;
+    width:1920px;
+    height:1080px;
+}
