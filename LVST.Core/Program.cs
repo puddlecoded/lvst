@@ -11,14 +11,14 @@ using Error = CommandLine.Error;
 using static System.Console;
 using System.Linq;
 
-namespace LVST
+namespace LVST.Core
 {
     class Program
     {
         public class Options
         {
             [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
-            public bool Verbose { get; set; } = true;
+            public bool Verbose { get; set; } = false;
             
             public string Btih { get; set; }
             private string _magnet;
@@ -66,18 +66,38 @@ namespace LVST
 
         private static async Task RunOptions(Options cliOptions)
         {
+            var streamingService = new StreamingService();
+            streamingService.OnReady += async (s) =>
+            {
+                Console.WriteLine($"Streaming -> Stream is ready!");
+                PlayAsync(s, cliOptions);
+
+            };
             var stream = await StartTorrenting(cliOptions);
-
-            await StartPlayback(stream, cliOptions);
-
+             streamingService.StreamAsync(stream);
+ 
             ReadKey();
+        }
+
+        private static void PlayAsync(string s, Options cliOptions)
+        {
+            LibVLCSharp.Shared.Core.Initialize();
+
+            libVLC = new LibVLC();
+            if(cliOptions.Verbose)
+                libVLC.Log += (l, e) => WriteLine($"LibVLC -> {e.FormattedLog}");
+
+            using var media = new Media(libVLC,s, FromType.FromPath, []);
+            mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.Play();
+
         }
 
         private static async Task StartPlayback(Stream stream, Options cliOptions)
         {
             WriteLine("LibVLCSharp -> Loading LibVLC core library...");
 
-            Core.Initialize();
+            LibVLCSharp.Shared.Core.Initialize();
 
             libVLC = new LibVLC();
             if(cliOptions.Verbose)

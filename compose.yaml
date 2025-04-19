@@ -1,0 +1,25 @@
+﻿services:
+  lvst.web:
+    image: lvst.web
+    build:
+      context: .
+      dockerfile: lvst.Web/Dockerfile
+
+  lvst.web-1:
+    image: lvst.web-1
+    build:
+      context: .
+      dockerfile: LVST.Web/Dockerfile
+
+  lvist.web:
+    image: lvist.web
+    build:
+      context: .
+      dockerfile: LVIST.Web/Dockerfile
+
+  lvst.ui:
+    image: lvst.ui
+    build:
+      context: .
+      dockerfile: LVST.UI/Dockerfile
+
