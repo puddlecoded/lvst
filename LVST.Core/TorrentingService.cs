@@ -9,7 +9,7 @@ namespace LVST.Core;
 
 public class TorrentingService
 {
-       public async Task<Stream> StartTorrenting(Options cliOptions)
+       public async Task<(Stream,string)> StartTorrenting(Options cliOptions)
         {
             TorrentManager manager = null;
             var engine = new ClientEngine();
@@ -61,7 +61,7 @@ public class TorrentingService
             Console.WriteLine($"MonoTorrent -> Creating a stream for the torrent file... {largestFile.Path}");
             var stream = await manager.StreamProvider.CreateStreamAsync(largestFile);
 
-            return stream;
+            return (stream,largestFile.Path);
         }
 
 }

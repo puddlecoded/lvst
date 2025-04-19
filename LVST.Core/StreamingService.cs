@@ -12,14 +12,14 @@ public class StreamingService
 {
     public event Action<string> OnReady;
 
-    public async void StreamAsync(Stream source, CancellationToken cancellationToken = default,
+    public async void StreamAsync(Stream source, string fname, CancellationToken cancellationToken = default,
         string ffmpegPath = @"C:\Users\piotr\AppData\Local\Microsoft\WinGet\Links\ffmpeg.exe",
         string ffmpegArgs =
             "-hwaccel d3d11va -i  - -sn -c:v h264_amf -ac 2 -c:a aac -f hls -hls_time 20 -hls_list_size 0 -hls_playlist_type event {plname}")
 
     {
         bool notified = false;
-        var dir = Path.Combine(Path.GetTempPath(), "LVST");
+        var dir = Path.Combine(Path.GetTempPath(), "LVST", fname.Substring(0,10));
         var plname = "stream.txt";
         var playlist = Path.Combine(dir, plname);
         if (!Directory.Exists(dir))

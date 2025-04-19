@@ -22,7 +22,7 @@
         <media-mute-button></media-mute-button>
         <media-volume-range></media-volume-range>
         <media-time-range></media-time-range>
-        <media-time-display showduration remaining></media-time-display>
+        <media-time-display showduration></media-time-display>
         <media-playback-rate-button></media-playback-rate-button>
         <media-fullscreen-button></media-fullscreen-button>
     </media-control-bar>
@@ -57,7 +57,8 @@
             {
                 Magnet = PlayerUrl,
             });
-            Streaming.StreamAsync(s!);
+            
+            Streaming.StreamAsync(s.Item1, s.Item2);
         }
     }
 
