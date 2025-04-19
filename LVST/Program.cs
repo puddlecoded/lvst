@@ -19,10 +19,24 @@ namespace LVST
         {
             [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
             public bool Verbose { get; set; } = true;
+            
+            public string Btih { get; set; }
+            private string _magnet;
 
             [Option('t', "torrent", Required = false, HelpText = "The torrent link to download and play")]
             public string Torrent { get; set; } = "http://www.publicdomaintorrents.com/bt/btdownload.php?type=torrent&file=Charlie_Chaplin_Mabels_Strange_Predicament.avi.torrent";
 
+            [Option('m', "magnet", Required = false, HelpText = "The magnet link to download and play")]
+            public string Magnet
+            {
+                get => _magnet;
+                set
+                {
+                    _magnet = value;
+                    Btih = value.IndexOf("btih:", StringComparison.Ordinal) > 0 ? value.Substring(value.IndexOf("btih:", StringComparison.Ordinal) + 5, 40) : string.Empty;
+                    
+                }
+            }
             // TODO: If multiple chromecast on the network, allow selecting it interactively via the CLI
             [Option('c', "cast", Required = false, HelpText = "Cast to the chromecast")]
             public bool Chromecast { get; set; }
@@ -112,23 +126,43 @@ namespace LVST
 
         private static async Task<Stream> StartTorrenting(Options cliOptions)
         {
+            TorrentManager manager = null;
             var engine = new ClientEngine();
-
-            WriteLine("MonoTorrent -> Loading torrent file...");
-            var torrent = await Torrent.LoadAsync(new Uri(cliOptions.Torrent),
-                Path.Combine(Environment.CurrentDirectory, "video.torrent"));
-
-            WriteLine("MonoTorrent -> Creating a new StreamProvider...");
-            var manager = await engine.AddStreamingAsync (torrent, cliOptions.Path);
-
-            if (cliOptions.Verbose)
+            if (string.IsNullOrWhiteSpace(cliOptions.Magnet))
             {
-                manager.PeerConnected += (o, e) => WriteLine($"MonoTorrent -> Connection succeeded: {e.Peer.Uri}");
-                manager.ConnectionAttemptFailed += (o, e) => WriteLine($"MonoTorrent -> Connection failed: {e.Peer.ConnectionUri} - {e.Reason} - {e.Peer}");
+                WriteLine("MonoTorrent -> Loading torrent file...");
+                var torrent = await Torrent.LoadAsync(new Uri(cliOptions.Torrent),
+                    Path.Combine(Environment.CurrentDirectory, "video.torrent"));
+                
+                WriteLine("MonoTorrent -> Creating a new StreamProvider...");
+                manager = await engine.AddStreamingAsync (torrent, cliOptions.Path);
+                
+                if (cliOptions.Verbose)
+                {
+                    manager.PeerConnected += (o, e) => WriteLine($"MonoTorrent -> Connection succeeded: {e.Peer.Uri}");
+                    manager.ConnectionAttemptFailed += (o, e) => WriteLine($"MonoTorrent -> Connection failed: {e.Peer.ConnectionUri} - {e.Reason} - {e.Peer}");
+                }
+
+                WriteLine("MonoTorrent -> Starting the StreamProvider...");
+                await manager.StartAsync();
+
+            }
+            else
+            {
+                MagnetLink magnetLink = MagnetLink.FromUri(new Uri(cliOptions.Magnet));
+                manager = await engine.AddStreamingAsync (magnetLink, cliOptions.Path);
+                
+                if (cliOptions.Verbose)
+                {
+                    manager.PeerConnected += (o, e) => WriteLine($"MonoTorrent -> Connection succeeded: {e.Peer.Uri}");
+                    manager.ConnectionAttemptFailed += (o, e) => WriteLine($"MonoTorrent -> Connection failed: {e.Peer.ConnectionUri} - {e.Reason} - {e.Peer}");
+                }
+
+                WriteLine("MonoTorrent -> Starting the StreamProvider...");
+                await manager.StartAsync();
             }
 
-            WriteLine("MonoTorrent -> Starting the StreamProvider...");
-            await manager.StartAsync();
+
 
             // As the TorrentManager was created using an actual torrent, the metadata will already exist.
             // This is future proofing in case a MagnetLink is used instead
