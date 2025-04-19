@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "build": "tailwindcss -i ./input.css -o ./wwwroot/app.css --minify",
+    "watch": "tailwindcss -i ./input.css -o ./wwwroot/app.css --watch"
+  },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.4",
     "tailwindcss": "^4.1.4"

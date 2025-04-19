@@ -1,0 +1,8 @@
+﻿@import "tailwindcss";
+
+.btn{
+    @apply bg-amber-500 text-gray-100 p-1 rounded cursor-pointer;
+}
+.btn:hover {
+    @apply bg-amber-600;
+}

@@ -2,3 +2,4 @@
 **/*.mkv
 **/*.nfo
 **/cache/**
+**/app.css

@@ -1,13 +1,15 @@
 ﻿@page "/Player"
 @using LVST.Core
 @inject StreamingService Streaming;
-@inject TorrentingService Torrent;
+@inject TorrentService Torrent;
 @inject NavigationManager Nav;
 <h3>Player</h3>
 @StreamUrl
-<input type ="text" @bind="PlayerUrl" placeholder="Enter video URL" />
-<button @onclick=" async () => await PlayAsync()">Load Video</button>
-<media-controller>
+<div>
+<input type ="text" @bind="PlayerUrl" placeholder="Enter video URL" class="bg-gray-100 text-gray-900 w-1/2 p-1" />
+<button @onclick=" async () => await PlayAsync()" class="btn">Load Video</button>
+</div>
+<media-controller class="aspect-ratio w-[1920px] h-[1080px]">
     <hls-video
         src="@StreamUrl"
         slot="media"
@@ -52,7 +54,7 @@
     {
         if (!string.IsNullOrEmpty(PlayerUrl))
         {
-            var s = await Torrent.StartTorrenting(new Options()
+            var s = await Torrent.StartAsync(new Options()
             {
                 Magnet = PlayerUrl,
             });

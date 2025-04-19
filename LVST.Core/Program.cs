@@ -42,8 +42,8 @@ namespace LVST.Core
                 PlayAsync(s, cliOptions);
 
             };
-            var ts = new TorrentingService();
-            var t = await ts.StartTorrenting(cliOptions);
+            var ts = new TorrentService();
+            var t = await ts.StartAsync(cliOptions);
              streamingService.StreamAsync(t.Item1, t.Item2);
  
             ReadKey();
