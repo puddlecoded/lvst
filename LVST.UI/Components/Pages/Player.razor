@@ -42,12 +42,19 @@
             Streaming.OnReady += async (s) =>
             {
                 var ub = new UriBuilder(Nav.BaseUri);
-                ub.Path = $"/streams/{ Path.GetFileName(Path.GetDirectoryName(s))}/{Path.GetFileName(s)}";
+                ub.Path = $"/streams/{Path.GetFileName(Path.GetDirectoryName(s))}/{Path.GetFileName(s)}";
                 StreamUrl = ub.ToString();
                 await InvokeAsync(StateHasChanged);
+            };
 
+            Streaming.OnCancel += async (string s) =>
+            {
+                StreamUrl = string.Empty;
+
+                await InvokeAsync(StateHasChanged);
             };
         }
+
         return base.OnAfterRenderAsync(firstRender);
     }
 
@@ -60,7 +67,10 @@
                 Magnet = PlayerUrl,
             });
 
-            Streaming.StreamAsync(s.Stream, s.FileName);
+            if (s != null)
+            {
+                await Streaming.StreamAsync(s.Stream, s.FileName);
+            }
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -10,7 +11,7 @@ namespace LVST.Core;
 
 public class TorrentService
 {
-       public async Task<TorrentServiceResponse> StartAsync(Options cliOptions,CancellationToken cancellationToken = default)
+       public async Task<TorrentServiceResponse?> StartAsync(Options cliOptions,CancellationToken cancellationToken = default)
         {
             TorrentManager manager = null;
             var engine = new ClientEngine();
@@ -65,12 +66,13 @@ public class TorrentService
             return null;
         }
 
-        private static async Task<TorrentServiceResponse> StreamFile(
+        private static async Task<TorrentServiceResponse?> StreamFile(
             ITorrentFileInfo file,
             TorrentManager manager,
             CancellationToken cancellationToken)
         {
-        
+
+            if (file == null) return null;
             var stream = await manager.StreamProvider.CreateStreamAsync(file, cancellationToken);
 
             return new TorrentServiceResponse() {Stream = stream, FileName = file.Path};
