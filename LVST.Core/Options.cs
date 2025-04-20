@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using CommandLine;
 
 namespace LVST.Core;
@@ -32,5 +33,16 @@ public class Options
     public bool Save { get; set; } = true;
 
     [Option('p', "path", Required = false, HelpText = "Set the path where to save the media file.")]
-    public string Path { get; set; } = Environment.CurrentDirectory;
+    public string Path
+    {
+        get
+        {
+            var p = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "cache");
+            if (!Directory.Exists(p))
+            {
+                Directory.CreateDirectory(p);
+            }
+            return p;
+        }
+    }
 }

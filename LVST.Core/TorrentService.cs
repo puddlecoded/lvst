@@ -10,7 +10,7 @@ namespace LVST.Core;
 
 public class TorrentService
 {
-       public async Task<(Stream,string)> StartAsync(Options cliOptions,CancellationToken cancellationToken = default)
+       public async Task<TorrentServiceResponse> StartAsync(Options cliOptions,CancellationToken cancellationToken = default)
         {
             TorrentManager manager = null;
             var engine = new ClientEngine();
@@ -57,12 +57,22 @@ public class TorrentService
                Console.WriteLine("MonoTorrent -> Waiting for the metadata to be downloaded from a peer...");
                 await manager.WaitForMetadataAsync(cancellationToken);
             }
-
-            var largestFile = manager.Files.OrderByDescending(t => t.Length).First();
-            Console.WriteLine($"MonoTorrent -> Creating a stream for the torrent file... {largestFile.Path}");
-            var stream = await manager.StreamProvider.CreateStreamAsync(largestFile, cancellationToken);
-
-            return (stream,largestFile.Path);
+            var files = manager.Files.OrderByDescending(t => t.Length).ToList();
+            if (files.Count >0)
+            {
+                return await StreamFile(files.First(), manager, cancellationToken);
+            }
+            return null;
         }
 
+        private static async Task<TorrentServiceResponse> StreamFile(
+            ITorrentFileInfo file,
+            TorrentManager manager,
+            CancellationToken cancellationToken)
+        {
+        
+            var stream = await manager.StreamProvider.CreateStreamAsync(file, cancellationToken);
+
+            return new TorrentServiceResponse() {Stream = stream, FileName = file.Path};
+        }
 }

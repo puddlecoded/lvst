@@ -5,16 +5,17 @@
 @inject NavigationManager Nav;
 <h3>Player</h3>
 @StreamUrl
-<div>
+<div class="mt-4">
 <input type ="text" @bind="PlayerUrl" placeholder="Enter video URL" class="bg-gray-100 text-gray-900 w-1/2 p-1" />
 <button @onclick=" async () => await PlayAsync()" class="btn">Load Video</button>
 </div>
-<media-controller class="aspect-ratio w-[1920px] h-[1080px]">
+<media-controller class="aspect-ratio w-[1920px] h-[1080px] mt-4">
     <hls-video
         src="@StreamUrl"
         slot="media"
         crossorigin
         autoplay
+        id="player"
     ></hls-video>
     <media-loading-indicator slot="centered-chrome" noautohide></media-loading-indicator>
     <media-control-bar>
@@ -31,7 +32,7 @@
 </media-controller>
 
 @code {
-    [Parameter] public string? PlayerUrl { get; set; } = "magnet:?xt=urn:btih:0411F5B9F074616DD4A0E3D3801FC55B252A0120&dn=S.W.A.T.2017.S08E18.720p.HDTV.x264-SYNCOPY&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftracker.bittor.pw%3A1337%2Fannounce&tr=udp%3A%2F%2Fpublic.popcorn-tracker.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce";
+    [Parameter] public string? PlayerUrl { get; set; } = "magnet:?xt=urn:btih:AC0F239B82F0D6E6D3F9CB5C3D04A4701FB5733F&dn=9-1-1.S08E15.1080p.x265-ELiTE&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969&tr=udp%3A%2F%2Ftracker.darkness.services%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce";
     private string? StreamUrl { get; set; }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
@@ -58,8 +59,8 @@
             {
                 Magnet = PlayerUrl,
             });
-            
-            Streaming.StreamAsync(s.Item1, s.Item2);
+
+            Streaming.StreamAsync(s.Stream, s.FileName);
         }
     }
 

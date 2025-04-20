@@ -36,21 +36,24 @@ namespace LVST.Core
         private static async Task RunOptions(Options cliOptions)
         {
             var streamingService = new StreamingService();
-            streamingService.OnReady += async (s) =>
+            streamingService.OnReady += async (streamFile) =>
             {
                 Console.WriteLine($"Streaming -> Stream is ready!");
-                PlayAsync(s, cliOptions);
+                
+                Play(streamFile, cliOptions);
 
             };
             var ts = new TorrentService();
             var t = await ts.StartAsync(cliOptions);
-             streamingService.StreamAsync(t.Item1, t.Item2);
+             streamingService.StreamAsync(t.Stream, t.FileName);
+            
  
             ReadKey();
         }
 
-        private static void PlayAsync(string s, Options cliOptions)
+        private static void Play(string s, Options cliOptions)
         {
+            WriteLine($"Playing {s}....");
             LibVLCSharp.Shared.Core.Initialize();
 
             libVLC = new LibVLC();
