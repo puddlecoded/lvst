@@ -13,7 +13,7 @@ public class TorrentService
 {
        public async Task<TorrentServiceResponse?> StartAsync(Options cliOptions,CancellationToken cancellationToken = default)
         {
-            TorrentManager manager = null;
+            TorrentManager manager;
             var engine = new ClientEngine();
             if (string.IsNullOrWhiteSpace(cliOptions.Magnet))
             {
@@ -67,7 +67,7 @@ public class TorrentService
         }
 
         private static async Task<TorrentServiceResponse?> StreamFile(
-            ITorrentFileInfo file,
+            ITorrentFileInfo? file,
             TorrentManager manager,
             CancellationToken cancellationToken)
         {

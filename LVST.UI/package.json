@@ -1,10 +1,15 @@
 {
   "scripts": {
-    "build": "tailwindcss -i ./input.css -o ./wwwroot/app.css --minify",
-    "watch": "tailwindcss -i ./input.css -o ./wwwroot/app.css --watch"
+    "build": "npm run bundle && tailwindcss -i ./input.css -o ./wwwroot/app.css --minify",
+    "watch": "tailwindcss -i ./input.css -o ./wwwroot/app.css --watch",
+    "bundle": "webpack ./index.js  --output-path ./wwwroot/js --output-filename index.bundle.js --mode=production"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.4",
-    "tailwindcss": "^4.1.4"
+    "hls-video-element": "^1.5.0",
+    "media-chrome": "^4.9.0",
+    "tailwindcss": "^4.1.4",
+    "webpack": "^5.99.6",
+    "webpack-cli": "^6.0.1"
   }
 }
