@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,6 +12,7 @@ namespace LVST.Core;
 
 public class TorrentService
 {
+    private Stream? _stream;
        public async Task<TorrentServiceResponse?> StartAsync(Options cliOptions,CancellationToken cancellationToken = default)
         {
             TorrentManager manager;
@@ -66,15 +68,39 @@ public class TorrentService
             return null;
         }
 
-        private static async Task<TorrentServiceResponse?> StreamFile(
+
+        public List<ITorrentFileInfo> Sources
+        {
+            get;
+            set;
+        }
+
+        public async Task<TorrentServiceResponse?> StreamFile(
             ITorrentFileInfo? file,
             TorrentManager manager,
             CancellationToken cancellationToken)
         {
+            try
+            {
+                if (_stream != null)
+                {
+                    _stream.Close();
+                    await _stream.DisposeAsync();
+                }
+                if (file == null) return null;
+                _stream = await manager.StreamProvider.CreateStreamAsync(file, cancellationToken);
+                if (_stream == null)
+                {
+                    Console.WriteLine("MonoTorrent -> Failed to create stream");
+                    return null;
+                }
 
-            if (file == null) return null;
-            var stream = await manager.StreamProvider.CreateStreamAsync(file, cancellationToken);
-
-            return new TorrentServiceResponse() {Stream = stream, FileName = file.Path};
+                return new TorrentServiceResponse() { Stream = _stream, FileName = file.Path };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
         }
 }

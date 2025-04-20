@@ -1,17 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using CliWrap;
-using CliWrap.EventStream;
 
 namespace LVST.Core;
 
 using CliWrap;
 public class StreamingService: IDisposable, IAsyncDisposable
 {
-    private Stream _stream;
     private CancellationTokenSource _cts;
     public event Action<string> OnReady;
     public event Action<string> OnCancel;
@@ -26,9 +22,7 @@ public class StreamingService: IDisposable, IAsyncDisposable
         try
         {
             await CancelStreamAsync();
-
-
-            _stream = source;
+            
 
             bool notified = false;
             var dir = Path.Combine(Path.GetTempPath(), "LVST", fname.ToBase64());
@@ -57,13 +51,13 @@ public class StreamingService: IDisposable, IAsyncDisposable
                     }
 
                 }))
-                .WithStandardInputPipe(PipeSource.FromStream(source));
+                .WithStandardInputPipe(PipeSource.FromStream(source,false));
 
             await cmd.ExecuteAsync(_cts!.Token, cancellationToken);
         }
         catch (OperationCanceledException)
         {
-            // Handle cancellation
+          await CancelStreamAsync();
         }
     }
 
@@ -77,25 +71,24 @@ public class StreamingService: IDisposable, IAsyncDisposable
 
         _cts = new CancellationTokenSource();
 
-        if (_stream != null)
-        {
-            await _stream.DisposeAsync();
-        }
-        
+        // if (_stream != null)
+        // {
+        //     _stream.Close();
+        //     await _stream.DisposeAsync();
+        // }
+        //
         OnCancel?.Invoke($"Stream cancelled");
     }
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        _stream?.Dispose();
         _cts?.Dispose();
     }
 
     public async ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
-        if (_stream != null) await _stream.DisposeAsync();
         if (_cts != null) await _cts.CancelAsync();
     }
 }
